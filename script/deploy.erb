@@ -1,0 +1,50 @@
+#!/bin/sh
+
+set -e
+
+DEPLOY_ID="<%= deploy_id %>"
+SLUG_URL="<%= slug_url %>"
+CONFIG_URL="<%= config_url %>"
+
+DEPLOY_PATH=/mnt/app/deploy/$DEPLOY_ID
+SLUG_FILE=$DEPLOY_PATH/`basename "$SLUG_URL | sed 's/\?.*//'`
+SLUG_PATH=${SLUG_FILE%.tar.gz}
+CONFIG_FILE=$DEPLOY_PATH/`basename "$CONFIG_URL | sed 's/\?.*//'`
+
+# Fetch the stuff
+
+mkdir -p $DEPLOY_PATH
+cd $DEPLOY_PATH
+
+cat $0 > release.sh
+
+curl -L -o "$SLUG_FILE" "$SLUG_URL"
+tar xzvf "$SLUG_FILE"
+
+curl -L -o "$CONFIG_FILE" "$CONFIG_URL"
+
+# Run the install
+$SLUG_PATH/script/install
+
+if [ -L /mnt/app/current ]; then
+  cp -df /mnt/app/current /mnt/app/current.old
+fi
+
+# Atomically link the new release
+ln -sf $SLUG_PATH /mnt/app/current.new 
+mv -f -T /mnt/app/current.new /mnt/app/current
+
+if /mnt/app/current/script/post-install ; then
+  echo Deploy $DEPLOY_ID successful
+  if [ -L /mnt/app/current.old ]; then
+    rm /mnt/app/current.old
+  fi
+else
+  echo Deploy $DEPLOY_ID failed
+  # Revert link if the post-install didn't work
+  if [ -L /mnt/app/current.old ]; then
+    mv -f -T /mnt/app/current.old /mnt/app/current
+  fi
+  false
+fi
+

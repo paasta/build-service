@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm -rf /home/vagrant/release
+/vagrant/script/release /home/vagrant/release
+sudo /home/vagrant/release/script/install /vagrant/script/vagrant-config.json

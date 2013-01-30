@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'open-uri'
+require 'yaml'
+require 'json'
+require 'pp'
+
+Line = Struct.new(:zone, :name, :version, :arch, :instance_type, :release, :ami, :aki)
+
+data = YAML.load open("http://cloud-images.ubuntu.com/locator/ec2/releasesTable")
+
+data2 = data["aaData"].map do |line|
+  line[6] = /launchAmi=([^"]+)"/.match(line[6])[1]
+  Line.new(*line)
+end
+
+def find_arch(lines, arch)
+  lines = lines.select{|l| l.arch == arch}
+  lines.size > 2 && p([:woops] + lines)
+  lines.size > 0 ? lines.first.ami : 'NOT_AVAILABLE'
+end
+
+def zone_line(data, name, instance_type, zone)
+  lines = data.select{|l| l.name == name && l.zone == zone && l.instance_type == instance_type }
+  {
+    "32" => find_arch(lines, 'i386'),
+    "64" => find_arch(lines, 'amd64'),
+    "64HVM" => 'NOT_SUPPORTED'
+  }
+end
+
+instance_type = "instance-store"
+name = ARGV[0] || "precise"
+
+output = {
+  "ImageMap" => {
+    "us-east-1"      => zone_line(data2, name, instance_type, "us-east-1"),
+    "us-west-1"      => zone_line(data2, name, instance_type, "us-west-1"),
+    "us-west-2"      => zone_line(data2, name, instance_type, "us-west-2"),
+    "eu-west-1"      => zone_line(data2, name, instance_type, "eu-west-1"),
+    "ap-southeast-1" => zone_line(data2, name, instance_type, "ap-southeast-1"),
+    "ap-northeast-1" => zone_line(data2, name, instance_type, "ap-northeast-1"),
+    "sa-east-1"      => zone_line(data2, name, instance_type, "sa-east-1")
+  }
+}
+
+puts JSON.dump(output)

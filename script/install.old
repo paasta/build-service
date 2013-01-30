@@ -1,0 +1,58 @@
+#!/bin/sh
+
+set -e
+
+if [ `id -u` != "0" ]; then
+  echo "Please run this script as root: sudo $@"
+  exit
+fi
+
+cd `dirname $0`/..
+
+# Install the heroku toolbelt for foreman export ?
+if ! [ -f /etc/apt/sources.list.d/heroku.list ]; then
+  echo "deb http://toolbelt.heroku.com/ubuntu ./" > /etc/apt/sources.list.d/heroku.list
+
+  # install heroku's release key for package verification
+  wget --progress=dot -O- https://toolbelt.heroku.com/apt/release.key | apt-key add -
+
+  # update your sources
+  apt-get update
+fi
+
+has() {
+  which $1 > /dev/null 2>&1
+  return $?
+}
+
+install() {
+  apt-get install -qy $@
+}
+
+if ! has foreman ; then
+  install foreman 
+fi
+
+if ! id -u app ; then
+  useradd app --home /app --create-home --system --user-group --shell /bin/bash
+fi
+
+### Project dependencies ###
+
+# TODO: This should be packaged with the app
+if ! has java ; then
+  install default-jre
+fi
+
+if ! has git ; then
+  install git
+fi
+
+### Post-install stuff ###
+
+# Init scripts
+foreman export upstart /etc/init
+
+# start the app
+start app
+

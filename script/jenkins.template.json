@@ -1,0 +1,139 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Jenkins server",
+
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type" : "String",
+      "Default" : "panda-staging-v2",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern" : "[-_ a-zA-Z0-9]*",
+      "ConstraintDescription" : "Can contain only alphanumeric characters, spaces, dashes and underscores."
+    },
+
+    "InstanceType" : {
+      "Description" : "Server EC2 instance type",
+      "Type" : "String",
+      "Default" : "c1.medium",
+      "ConstraintDescription" : "Must be a valid EC2 instance type."
+    },
+
+    "PublicBucket" : {
+      "Description" : "S3 bucket for storing build artifacts",
+      "Type" : "String",
+      "Default" : "panda-artifacts-staging",
+      "ConstraintDescription" : "Must be a valid S3 Bucket"
+    }
+  },
+
+  "Mappings" : {
+    "ImageMap" : {
+      "us-east-1": {"32":"ami-1f24a976","64":"ami-d726abbe","64HVM":"NOT_SUPPORTED"},
+      "us-west-1": {"32":"ami-4c725209","64":"ami-827252c7","64HVM":"NOT_SUPPORTED"},
+      "us-west-2": {"32":"ami-9a2ca4aa","64":"ami-ca2ca4fa","64HVM":"NOT_SUPPORTED"},
+      "eu-west-1": {"32":"ami-ca0e02be","64":"ami-3a0f034e","64HVM":"NOT_SUPPORTED"},
+      "ap-southeast-1": {"32":"ami-55226007","64":"ami-15226047","64HVM":"NOT_SUPPORTED"},
+      "ap-northeast-1": {"32":"ami-5eaa115f","64":"ami-70a91271","64HVM":"NOT_SUPPORTED"},
+      "sa-east-1": {"32":"ami-59eb3344","64":"ami-6beb3376","64HVM":"NOT_SUPPORTED"}}
+    }
+  },
+
+  "Resources" : {
+    "jenkins-server-staging-role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [ "ec2.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path": "/",
+        "Policies": [ {
+          "PolicyName": "root",
+          "PolicyDocument": {
+            "Statement": [ {
+              "Effect": "Allow",
+              "Action": "*",
+              "Resource": "*"
+            } ]
+          }
+        } ]
+      }
+    },
+
+    "jenkins-server-staging-instanceprofile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          { "Ref": "jenkins-server-staging-role" }
+        ]
+      }
+    },
+
+    "jenkins-server-staging" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "jenkins-server-staging",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }
+    },
+
+    "jenkins-slave-staging" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "jenkins-slave-staging",
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"},
+          {"IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }
+    },
+
+    "Server": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn" : "PrivateBucketPolicy",
+      "Properties": {
+        "ImageId" : {
+          "Fn::FindInMap" : [ "ImageMap", { "Ref" : "AWS::Region" }, "64" ]
+        },
+        "InstanceType"   : { "Ref" : "InstanceType" },
+        "SecurityGroups" : [ {"Ref" : "jenkins-server-staging"}, "default" ],
+        "IamInstanceProfile" : {"Fn::GetAtt" : ["jenkins-server-staging-instanceprofile", "Arn"] },
+        "KeyName"        : { "Ref" : "KeyName" },
+        "Tags"           : [
+          { "Key": "App",  "Value": "jenkins" },
+          { "Key": "Role", "Value": "server" },
+          { "Key": "Env",  "Value": { "Ref": "Env" } }
+        ],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["\n", [
+          "#!/bin/bash -v",
+          "true"
+        ]]}}
+      }
+    },
+
+  },
+
+  "Outputs" : {
+    "Instance": {
+      "Description": "DNS Name of the newly created EC2 instance", 
+      "Value": { "Fn::GetAtt": [ "Server", "PublicDnsName" ] }
+    },
+    "JenkinsURL" : {
+      "Value" : { "Fn::Join" : ["", ["http://", {"Fn::GetAtt": ["Server", "PublicDnsName"] }, ":8080/jenkins"]] },
+      "Description" : "URL for newly created Jenkins app"
+    }
+  }
+
+}

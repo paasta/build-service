@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+
+if [ `id -u` != "0" ]; then
+  exec sudo $0
+fi
+
+cd `dirname $0`/..
+
+has() {
+  which $1 > /dev/null 2>&1
+  return $?
+}
+
+install() {
+  apt-get update -qy
+  apt-get install -qy $@
+}
+
+if ! has java ; then
+  install default-jre
+fi

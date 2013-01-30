@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+if [ `id -u` != "0" ]; then
+  echo "Please run this script as root: sudo $@"
+  exit
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+
+if ! which jenkins > /dev/null 2>&1 ; then
+  apt-get update -qy
+  apt-get install -qy jenkins
+fi
+
+export JENKINS_URL=http://localhost:8080
+#jenkins-cli install-plugin foobar
