@@ -19,7 +19,7 @@ cd $DEPLOY_PATH
 cat $0 > release.sh
 
 curl -L -o "$SLUG_FILE" "$SLUG_URL"
-tar xzvf "$SLUG_FILE"
+tar xzvf --no-same-owner "$SLUG_FILE"
 
 curl -L -o "$CONFIG_FILE" "$CONFIG_URL"
 
