@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.audit__trail.AuditTrailPlugin plugin="audit-trail@1.7">
+  <log>/var/lib/jenkins/audit.log</log>
+  <pattern>.*/(?:configSubmit|doDelete|postBuildResult|cancelQueue|stop|toggleLogKeep|doWipeOutWorkspace|createItem|createView|toggleOffline)</pattern>
+  <limit>1</limit>
+  <count>10</count>
+  <logBuildCause>true</logBuildCause>
+</hudson.plugins.audit__trail.AuditTrailPlugin>

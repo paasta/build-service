@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description><%= @description %></description>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@1.1.26">
@@ -45,13 +45,37 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.5">
+      <spec></spec>
+    </com.cloudbees.jenkins.GitHubPushTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./script/release .release/$BUILD_NUMBER</command>
+      <command>./script/release .release/$BUILD_NUMBER &amp;&amp; cd .release &amp;&amp; tar czf $BUILD_NUMBER.tar.gz $BUILD_NUMBER</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
-  <buildWrappers/>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>.release/$BUILD_NUMBER.tar.gz</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.s3.S3BucketPublisher plugin="s3@0.3.2">
+      <profileName>Artifacts</profileName>
+      <entries>
+        <hudson.plugins.s3.Entry>
+          <bucket>jenkins-<%= @name %>-slugs</bucket>
+          <sourceFile>.release/$BUILD_NUMBER.tar.gz</sourceFile>
+        </hudson.plugins.s3.Entry>
+      </entries>
+    </hudson.plugins.s3.S3BucketPublisher>
+  </publishers>
+  <buildWrappers>
+    <org.jenkinsCi.plugins.projectDescriptionSetter.DescriptionSetterWrapper plugin="project-description-setter@1.1">
+      <charset>UTF-8</charset>
+      <projectDescriptionFilename>README.md</projectDescriptionFilename>
+      <disableTokens>false</disableTokens>
+    </org.jenkinsCi.plugins.projectDescriptionSetter.DescriptionSetterWrapper>
+  </buildWrappers>
 </project>
