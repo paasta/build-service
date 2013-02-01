@@ -11,11 +11,19 @@ include_recipe "jenkins::proxy_nginx"
 nginx_site "jenkins.conf", enable: true
 nginx_site "default", enable: false
 
+# Allow the jenskins agents to install packages with sudo
+# [z] - probably a bad idea but useful...
+template "/etc/sudoers.d/00-jenkins" do
+  mode 0440
+  source "jenkins_sudoers.erb"
+  variables login_user: "jenkins"
+end
+
 # Make sure we have to git package to fetch repos
 package "git"
 
 %w[
-  audit_trail.xml
+  audit-trail.xml
   config.xml
   hudson.plugins.git.GitSCM.xml
   hudson.plugins.s3.S3BucketPublisher.xml
@@ -26,15 +34,8 @@ package "git"
     #group default[:jenkins][:server][:group]
     #source "#{config_file}.erb"
     variables node.build_service
+    notifies :restart, "service[jenkins]"
   end
-end
-
-# Allow the jenskins agents to install packages with sudo
-# [z] - probably a bad idea but useful...
-template "/etc/sudoers.d/00-jenkins" do
-  mode 0440
-  source "jenkins_sudoers.erb"
-  variables login_user: "jenkins"
 end
 
 ### Configuring jobs ###
