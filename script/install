@@ -24,4 +24,4 @@ if ! has ruby1.9.3 ; then
   install ruby1.9.3
 fi
 
-exec bin/chef-solo -c config/chef-solo.rb -j $CONFIG_PATH
+exec bin/chef-solo -c $PWD/config/chef-solo.rb -j $CONFIG_PATH
