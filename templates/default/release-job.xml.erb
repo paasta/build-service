@@ -53,7 +53,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./script/release .release/$BUILD_NUMBER &amp;&amp; cd .release &amp;&amp; tar czf $BUILD_NUMBER.tar.gz $BUILD_NUMBER</command>
+      <command>./script/slugify .cache .release/$BUILD_NUMBER &amp;&amp; cd .release &amp;&amp; tar czf $BUILD_NUMBER.tar.gz $BUILD_NUMBER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

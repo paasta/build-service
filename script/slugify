@@ -5,7 +5,8 @@ cd `dirname $0`
 . stdlib.sh
 cd ..
 
-DESTDIR=$1
+CACHE_DIR=$1
+DESTDIR=$2
 
 if [ -z "$DESTDIR" ]; then
   fail "Missing the first argument: the destination path"
