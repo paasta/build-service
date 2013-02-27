@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cd `dirname $0`
-. stdlib.sh
+. ploy-lib.sh
 cd ..
 
 CONFIG_PATH=$1
@@ -21,7 +21,7 @@ fi
 # Install project's runtime dependencies
 
 if ! has ruby1.9.3 ; then
-  install ruby1.9.3
+  system_install ruby1.9.3
 fi
 
 exec bin/chef-solo -c $PWD/config/chef-solo.rb -j $CONFIG_PATH

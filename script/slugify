@@ -2,7 +2,7 @@
 
 set -e
 cd `dirname $0`
-. stdlib.sh
+. ploy-lib.sh
 cd ..
 
 CACHE_DIR=$1
@@ -15,14 +15,14 @@ fi
 ## Build dependencies ##
 # FIXME: This should be handled by a dependency system
 if ! has ruby1.9.3 ; then
-  sudo apt-get install -qy ruby1.9.3 build-essential libxml2-dev libxslt-dev
+  system_install ruby1.9.3 build-essential libxml2-dev libxslt-dev
   echo gem: --no-ri --no-rdoc | sudo tee /etc/gemrc
   sudo gem install bundler
   sudo gem install berkshelf
 fi
 
 if ! has git ; then
-  sudo apt-get install -qy git
+  system_install -qy git
 fi
 
 ## Copying the release files ##
