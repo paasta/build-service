@@ -8,6 +8,7 @@ set[:jenkins][:server][:plugins] = %w[
   external-monitor-job
   ghprb
   git
+  git-client
   github
   github-api
   github-oauth
