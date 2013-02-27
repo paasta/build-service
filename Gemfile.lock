@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/pandastream/ploy-scripts.git
+  revision: 2b2c85b6df451f4d059d799da5370cc9c3f40a33
+  specs:
+    ploy-scripts (0.1.0)
+      multi_json (> 1.4)
+
 PATH
   remote: ../ploy
   specs:
@@ -6,12 +13,6 @@ PATH
       multi_json
       ploy-scripts (= 0.1.0)
       thor
-
-PATH
-  remote: ../ploy-scripts
-  specs:
-    ploy-scripts (0.1.0)
-      multi_json (> 1.4)
 
 GEM
   remote: http://rubygems.org/
