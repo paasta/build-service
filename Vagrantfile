@@ -3,6 +3,7 @@
 # To use, install vagrant at http://vagrantup.com/
 
 require 'berkshelf/vagrant'
+require 'ploy-scripts'
 
 def ENV.to_config(keys)
   keys.inject({}) do |hash, key|
@@ -12,23 +13,28 @@ def ENV.to_config(keys)
 end
 
 Vagrant::Config.run do |config|
-  config.vm.box = "ec2-precise64"
-  config.vm.box_url =
-    "https://s3.amazonaws.com/mediacore-public/boxes/ec2-precise64.box"
+  config.vm.define :server do |_config|
+    _config.vm.box = "ec2-precise64"
+    _config.vm.box_url =
+      "https://s3.amazonaws.com/mediacore-public/boxes/ec2-precise64.box"
 
-# Used to test the release / install loop
-#  config.vm.provision :shell, :path => "script/vagrant-deploy"
+  # Used to test the release / install loop
+  #  config.vm.provision :shell, :path => "script/vagrant-deploy"
 
-  config.vm.forward_port 80, 8080
+    _config.vm.forward_port 80, 8080
 
-  # Makes chef availabe on the host
-  config.vm.provision :shell, :path => 'script/vagrant-bootstrap'
+    # Makes chef availabe on the host
+    _config.vm.provision :shell, :path => 'script/vagrant-bootstrap'
 
-  config.vm.provision :chef_solo do |chef|
-    chef.add_recipe "build-service"
-    chef.json = {
-      build_service: ENV.to_config(%w[AWS_ACCESS_KEY AWS_SECRET_KEY AWS_PRIVATE_KEY GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET])
-    }
+    _config.vm.provision :chef_solo do |chef|
+      chef.add_recipe "build-service"
+      chef.json = {
+        build_service: ENV.to_config(%w[AWS_ACCESS_KEY AWS_SECRET_KEY AWS_PRIVATE_KEY GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET])
+      }
+    end
   end
 
+  config.vm.define(:build) do |_config|
+    PloyScripts.vagrant_build_box _config
+  end
 end

@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/pandastream/ploy-scripts.git
+  revision: 9d42ecbb72ce7a38e732d04fe92160ef4b36ee0a
+  specs:
+    ploy-scripts (0.1.0)
+      multi_json (> 1.4)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -158,5 +165,6 @@ PLATFORMS
 DEPENDENCIES
   berkshelf (= 1.2.0rc1)
   chef (= 10.18.2)
+  ploy-scripts!
   thor-foodcritic
   vagrant (= 1.0.5)

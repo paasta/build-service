@@ -7,5 +7,5 @@ group :development do
   gem 'vagrant', '1.0.5'
   gem 'thor-foodcritic'
   #gem 'ploy', path: '../ploy'
-  #gem 'ploy-scripts', github: 'pandastream/ploy-scripts'
+  gem 'ploy-scripts', github: 'pandastream/ploy-scripts'
 end

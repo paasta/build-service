@@ -8,5 +8,9 @@ has() {
 }
 
 system_install() {
+  if [ -z "$system_updated" ]; then
+    sudo apt-get update -qy
+    system_updated=1
+  fi
   DEBIAN_FRONTEND=noninteractive sudo apt-get install -qy $@
 }
