@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/pandastream/ploy-scripts.git
-  revision: e1f70fefb2d9cea313e321dbd6b544ea2faf0adb
+  revision: 8951328ffb52bb1e516185fa8bf4edd6bbc3337d
   specs:
     ploy-scripts (0.1.0)
       multi_json (> 1.4)
