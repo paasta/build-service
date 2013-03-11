@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+site 'http://community.opscode.com/api/v1'
+
+# Fails. TODO: Find a way to include the current cookbook
+#cookbook 'build-server', path: '.'
+
+cookbook 'machine-base',
+  git: 'https://github.com/zimbatm/machine-base'
+
+cookbook 'jenkins',
+  git: 'https://github.com/zimbatm/chef-jenkins'

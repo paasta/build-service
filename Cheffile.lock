@@ -1,0 +1,63 @@
+SITE
+  remote: http://community.opscode.com/api/v1
+  specs:
+    apt (1.9.0)
+    build-essential (1.3.4)
+    chef_handler (1.1.4)
+    iptables (0.12.0)
+    java (1.10.0)
+      windows (>= 0.0.0)
+    logrotate (1.1.0)
+    motd-tail (1.2.0)
+    nginx (1.4.0)
+      apt (>= 0.0.0)
+      build-essential (>= 0.0.0)
+      ohai (>= 1.1.4)
+      yum (>= 0.0.0)
+    ohai (1.1.8)
+    openssh (1.1.4)
+    python (1.2.2)
+      build-essential (>= 0.0.0)
+      yum (>= 0.0.0)
+    runit (1.1.0)
+      build-essential (>= 0.0.0)
+    windows (1.8.4)
+      chef_handler (>= 0.0.0)
+    yum (2.1.0)
+
+GIT
+  remote: https://github.com/zimbatm/chef-jenkins
+  ref: master
+  sha: 02147a5c24a2278d5dec155c1bd0993828be9903
+  specs:
+    jenkins (0.5.0)
+      apt (>= 0.0.0)
+      iptables (>= 0.0.0)
+      java (>= 0.0.0)
+      runit (>= 0.0.0)
+
+GIT
+  remote: https://github.com/zimbatm/machine-base
+  ref: master
+  sha: 4e53c9fce26970d8dc071469e94cb452fb3ad552
+  specs:
+    machine-base (1.0.0)
+      build-essential (>= 0.0.0)
+      logrotate (>= 0.0.0)
+      motd-tail (>= 0.0.0)
+      openssh (>= 0.0.0)
+      python (>= 0.0.0)
+
+PATH
+  remote: .
+  specs:
+    build-server (0.1.0)
+      jenkins (>= 0.0.0)
+      machine-base (>= 0.0.0)
+      nginx (>= 0.0.0)
+
+DEPENDENCIES
+  build-server (>= 0)
+  jenkins (>= 0)
+  machine-base (>= 0)
+

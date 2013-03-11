@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 # To use, install vagrant at http://vagrantup.com/
 
-require 'berkshelf/vagrant'
+require 'vagrant-librarian'
 require 'ploy-scripts'
 
 def ENV.to_config(keys)

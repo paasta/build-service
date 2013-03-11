@@ -24,4 +24,7 @@ cd "$DESTDIR"
 
 ## Installing the runtime dependencies ##
 bundle install --path=vendor --deployment --binstubs=bin --without="development test"
-berks install --path vendor/cookbooks
+export LIBRARIAN_CHEF_PATH=vendor/cookbooks
+export LIBRARIAN_CHEF_TMP="$CACHE_DIR/librarian"
+export LIBRARIAN_CHEF_INSTALL__STRIP_DOT_GIT=1
+librarian-chef install
