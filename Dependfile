@@ -1,0 +1,10 @@
+curl              apt build runtime
+ruby1.9.3         apt build runtime
+build-essential   apt build
+libxml2-dev       apt build
+libxml2           apt runtime
+libxslt1-dev      apt build
+libxslt1.1        apt runtime
+git               apt build
+bundler           gem build runtime
+berkshelf         gem build

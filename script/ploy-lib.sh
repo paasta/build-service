@@ -1,3 +1,7 @@
+
+# Don't ... ask ... questions !
+export DEBIAN_FRONTEND='noninteractive'
+
 fail() {
   echo "$@" >&2
   exit 1

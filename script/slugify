@@ -1,36 +1,27 @@
 #!/usr/bin/env bash
 
 set -e
-cd `dirname $0`
-. ploy-lib.sh
-cd ..
 
-CACHE_DIR=$1
-DESTDIR=$2
+. `dirname $0`/ploy-lib.sh
+
+CACHE_DIR=`expand_path "$1"`
+DESTDIR=`expand_path "$2"`
 
 if [ -z "$DESTDIR" ]; then
   fail "Missing the first argument: the destination path"
 fi
 
-## Build dependencies ##
-# FIXME: This should be handled by a dependency system
-if ! has ruby1.9.3 ; then
-  system_install ruby1.9.3 build-essential libxml2-dev libxslt-dev
-  echo gem: --no-ri --no-rdoc | sudo tee /etc/gemrc
-  sudo gem install bundler
-  sudo gem install berkshelf
-fi
+cd `dirname $0`/..
 
-if ! has git ; then
-  system_install -qy git
-fi
+## Build dependencies ##
+depend Dependfile build
 
 ## Copying the release files ##
-rm -rf $DESTDIR
-mkdir -p $DESTDIR
-cp -r * $DESTDIR
-cd $DESTDIR
+rm -rf "$DESTDIR"
+mkdir -p "$DESTDIR"
+cp -r * "$DESTDIR"
+cd "$DESTDIR"
 
 ## Installing the runtime dependencies ##
-bundle install --deployment --binstubs=bin "--without=development test"
+bundle install --path=vendor --deployment --binstubs=bin --without="development test"
 berks install --path vendor/cookbooks
