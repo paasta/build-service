@@ -4,7 +4,7 @@ class Chef::REST
   def gzip_disabled?; true; end
 end
 
-include_recipe "machine-base"
+include_recipe "base"
 include_recipe "jenkins"
 include_recipe "jenkins::proxy_nginx"
 
@@ -28,12 +28,12 @@ package "git"
   hudson.plugins.git.GitSCM.xml
   hudson.plugins.s3.S3BucketPublisher.xml
 ].each do |config_file|
-  template File.join(node.jenkins.server.home, config_file) do
+  template File.join(node[:jenkins][:server][:home], config_file) do
     mode 0644
     #owner default[:jenkins][:server][:user]
     #group default[:jenkins][:server][:group]
     #source "#{config_file}.erb"
-    variables node.build_service
+    variables node[:build_service]
     notifies :restart, "service[jenkins]"
   end
 end

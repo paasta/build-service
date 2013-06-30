@@ -2,5 +2,5 @@ site :opscode
 
 metadata
 
-cookbook 'machine-base', github: 'zimbatm/machine-base'
+cookbook 'base', github: 'zimbatm/base-cookbook'
 cookbook 'jenkins', github: 'zimbatm/chef-jenkins'
