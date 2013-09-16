@@ -8,8 +8,11 @@ include_recipe "base"
 include_recipe "jenkins"
 include_recipe "jenkins::proxy_nginx"
 
+file "/etc/nginx/sites-enabled/default" do
+  action :delete
+end
+
 nginx_site "jenkins.conf", enable: true
-nginx_site "default", enable: false
 
 # Allow the jenskins agents to install packages with sudo
 # [z] - probably a bad idea but useful...
