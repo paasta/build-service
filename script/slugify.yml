@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  connection: local
+  sudo: true
+  tasks:
+    - name: Cleanup previous slug
+      command: rm -rf {{ dest_dir }}
+
+    - name: Clone to destination
+      git: repo={{ src_dir }} dest={{ dest_dir }}
+
+    - name: Berkshelf
+      shell: BERKSHELF_PATH={{ cache_dir }}/berkshelf berks install --path vendor/cookbooks
+      args:
+        chdir: "{{ dest_dir }}"

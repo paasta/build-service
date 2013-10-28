@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  sudo: true
+  tasks:
+    - name: Run chef-solo
+      command: chef-solo -c {{ src_dir }}/script/chef-solo.rb -j {{ config_path }}
+

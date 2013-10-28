@@ -1,8 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
 
-. `dirname $0`/ploy-lib.sh
+expand_path() {
+  mkdir -p `dirname "$1"`
+  cd `dirname "$1"`
+  echo $PWD/`basename "$1"`
+}
+
 CONFIG_PATH=`expand_path $1`
 cd `dirname $0`/..
+. /etc/lsb-release
 
 if [ `id -u` != "0" ]; then
   fail "Please run this script as root: sudo $0 $@"
@@ -16,7 +23,12 @@ if ! [ -f "$CONFIG_PATH" ]; then
   fail "Config file not found at $CONFIG_PATH"
 fi
 
-# Install project's runtime dependencies
-depend Dependfile runtime
+if ! [ -f /etc/apt/sources.list.d/rquillo-ansible-$DISTRIB_CODENAME.list ]; then
+  echo "Install ansible"
+  apt-get install -qy python-software-properties
+  apt-add-repository -y ppa:rquillo/ansible
+  apt-get update -qq
+  DEBIAN_FRONTEND=noninteractive apt-get install -qy ansible
+fi
 
-exec bin/chef-solo -c $PWD/config/chef-solo.rb -j $CONFIG_PATH
+exec ansible-playbook -i localhost, -e "src_dir=$PWD config_path=$CONFIG_PATH" script/install.yml
